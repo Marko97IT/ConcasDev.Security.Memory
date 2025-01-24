@@ -1,0 +1,58 @@
+name: .NET Unit Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            framework: net6.0
+          - os: ubuntu-latest
+            framework: net7.0
+          - os: ubuntu-latest
+            framework: net8.0
+          - os: ubuntu-latest
+            framework: net9.0
+          - os: windows-latest
+            framework: net6.0
+          - os: windows-latest
+            framework: net7.0
+          - os: windows-latest
+            framework: net8.0
+          - os: windows-latest
+            framework: net9.0
+          - os: macos-latest
+            framework: net6.0
+          - os: macos-latest
+            framework: net7.0
+          - os: macos-latest
+            framework: net8.0
+          - os: macos-latest
+            framework: net9.0
+        
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ConcasDev.Security.Memory.sln
+
+      - name: Build solution
+        run: dotnet build ConcasDev.Security.Memory.sln --configuration Release --no-restore --framework ${{ matrix.framework }}
+
+      - name: Run tests
+        run: dotnet test ConcasDev.Security.Memory.sln --configuration Release --no-build --framework ${{ matrix.framework }} --verbosity normal
